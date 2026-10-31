@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Nombres</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f4f4f4; margin: 5px 0; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h2>Guardar Nombre en Base de Datos</h2>
+    <form id="nameForm">
+        <input type="text" id="nombreInput" placeholder="Escribe tu nombre..." required>
+        <button type="submit">Guardar</button>
+    </form>
+
+    <h3>Nombres Guardados:</h3>
+    <ul id="listaNombres"></ul>
+
+    <script>
+        // Cargar nombres al iniciar
+        async function cargarNombres() {
+            const res = await fetch('/nombres');
+            const nombres = await res.json();
+            const lista = document.getElementById('listaNombres');
+            lista.innerHTML = '';
+            nombres.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item.nombre;
+                lista.appendChild(li);
+            });
+        }
+
+        // Enviar nuevo nombre
+        document.getElementById('nameForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('nombreInput').value;
+
+            await fetch('/nombres', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre: nombre })
+            });
+
+            document.getElementById('nombreInput').value = '';
+            cargarNombres();
+        });
+
+        cargarNombres();
+    </script>
+</body>
+</html>
